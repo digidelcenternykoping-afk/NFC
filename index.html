@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>NFC Skanner</title>
+<meta name="theme-color" content="#0b1220" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header>
+  <img src="icons/icon-192.png" alt="" />
+  <div>
+    <h1>NFC Skanner</h1>
+    <div class="sub">Läs &amp; skriv NFC-taggar</div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="barcode" class="active">Streckkod</button>
+  <button data-tab="read">Läs (avancerat)</button>
+  <button data-tab="write">Skriv</button>
+  <button data-tab="history">Historik</button>
+</nav>
+
+<main>
+
+  <!-- BARCODE (auto-extract + copy) -->
+  <section id="view-barcode" class="view active">
+    <div class="card">
+      <h2>Skanna</h2>
+      <button class="btn" id="barcode-scan-btn">Starta kontinuerlig skanning</button>
+      <div class="status"><span class="dot" id="barcode-scan-dot"></span><span id="barcode-scan-status">Redo</span></div>
+      <div class="hint">Håll taggen mot telefonens NFC-läsare. Skanningen fortsätter automatiskt tills du stoppar den, så du kan skanna flera hyllprylar i rad.</div>
+    </div>
+
+    <div class="card" id="barcode-result-card">
+      <h2>Extraherad kod</h2>
+      <div class="big-code" id="barcode-code">—</div>
+      <div class="hint" id="barcode-code-meta"></div>
+      <button class="btn" id="barcode-copy-btn">Kopiera</button>
+    </div>
+
+    <div class="card">
+      <h2>Inställningar för extrahering</h2>
+      <label for="bc-source">Källa i taggdata</label>
+      <select id="bc-source">
+        <option value="auto">Auto (text/URL avkodas, annars hex)</option>
+        <option value="hex">Rå hexdata</option>
+        <option value="utf8">Tvinga UTF-8-text</option>
+      </select>
+
+      <label for="bc-record-index">Vilken NDEF-post (0 = första)</label>
+      <input type="text" inputmode="numeric" id="bc-record-index" value="0" />
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="bc-digits-only" checked />
+        Endast siffror (filtrera bort allt annat)
+      </label>
+
+      <div class="row">
+        <div>
+          <label for="bc-skip">Hoppa över tecken</label>
+          <input type="text" inputmode="numeric" id="bc-skip" value="0" />
+        </div>
+        <div>
+          <label for="bc-length">Antal tecken att ta</label>
+          <input type="text" inputmode="numeric" id="bc-length" value="11" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Senast skannade koder</h2>
+      <div id="barcode-recent"><div class="empty">Inga skanningar än.</div></div>
+    </div>
+  </section>
+
+  <!-- READ -->
+  <section id="view-read" class="view">
+    <div class="card">
+      <h2>Utdataformat</h2>
+      <label for="fmt-select">Visa skannad data som</label>
+      <select id="fmt-select">
+        <option value="auto">Auto (text/URL avkodas, annars hex)</option>
+        <option value="utf8">UTF-8-text (tvinga textavkodning)</option>
+        <option value="hex">Hexadecimal</option>
+        <option value="dec">Decimal bytearray</option>
+        <option value="base64">Base64</option>
+        <option value="binary">Binär (bitar)</option>
+        <option value="json">JSON (full struktur)</option>
+      </select>
+
+      <label for="rec-filter">Poster att visa</label>
+      <select id="rec-filter">
+        <option value="all">Alla NDEF-poster</option>
+        <option value="text">Endast text</option>
+        <option value="url">Endast URL</option>
+        <option value="mime">Endast MIME</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h2>Skanna</h2>
+      <button class="btn" id="scan-btn">Starta skanning</button>
+      <div class="status"><span class="dot" id="scan-dot"></span><span id="scan-status">Redo</span></div>
+      <div class="hint">Kräver Chrome på Android med NFC påslaget. Håll telefonens NFC-läsare (oftast baksidan, ovanför mitten) mot taggen.</div>
+    </div>
+
+    <div class="card" id="result-card" style="display:none;">
+      <h2>Senaste skanning <span class="badge" id="result-badge"></span></h2>
+      <div id="result-records"></div>
+      <div class="row">
+        <button class="btn secondary" id="copy-result-btn">Kopiera</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- WRITE -->
+  <section id="view-write" class="view">
+    <div class="card">
+      <h2>Skriv till tagg</h2>
+      <label for="write-type">Typ</label>
+      <select id="write-type">
+        <option value="text">Text</option>
+        <option value="url">URL / länk</option>
+      </select>
+      <label for="write-value">Innehåll</label>
+      <textarea id="write-value" placeholder="Skriv text eller https://..."></textarea>
+      <button class="btn" id="write-btn">Skriv till tagg</button>
+      <div class="status"><span class="dot" id="write-dot"></span><span id="write-status">Redo</span></div>
+      <div class="hint">Tryck på knappen och håll sedan en skrivbar/tom NFC-tagg mot telefonen.</div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="view-history" class="view">
+    <div class="card">
+      <h2>Sparade skanningar</h2>
+      <div id="history-list"><div class="empty">Inga sparade skanningar än.</div></div>
+      <div class="row">
+        <button class="btn secondary" id="export-json-btn">Exportera JSON</button>
+        <button class="btn secondary" id="export-csv-btn">Exportera CSV</button>
+      </div>
+      <button class="btn danger" id="clear-history-btn" style="margin-top:10px;">Rensa historik</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
