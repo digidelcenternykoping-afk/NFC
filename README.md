@@ -108,3 +108,17 @@ lägre nivås NFC-åtkomst). Säg till så felsöker vi vidare.
 - Det här är inte en app i Google Play — det är en installerbar webbsida
   (PWA). Den fungerar och känns som en app, men distribueras inte via
   Play Store.
+
+---
+
+## Solitaire
+
+I mappen [`solitaire/`](solitaire/) finns ett fristående Klondike-solitaire
+(egen grafik) som fungerar med mus och touch, på mobil och dator. Det
+publiceras via GitHub Pages på `/NFC/solitaire/`.
+
+- Inga cookies, ingen spårning och inga externa resurser (typsnitt, CDN m.m.).
+- Inställningar, statistik och pågående spel sparas i webbläsarens
+  `localStorage` **bara** om spelaren trycker på "Godkänn" i notisen. Det kan
+  när som helst stängas av och raderas i menyn.
+- Dra 1 eller dra 3 kort väljs i menyn.

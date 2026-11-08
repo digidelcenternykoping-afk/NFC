@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a4d29">
+  <meta name="description" content="Klassiskt Klondike-solitaire som fungerar på mobil och dator. Inga cookies, ingen spårning.">
+  <title>Solitaire</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='8' y='4' width='48' height='56' rx='6' fill='%23fffdf7' stroke='%23333' stroke-width='2'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle' fill='%23c8102e'%3E%E2%99%A5%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="board" aria-label="Spelbord"></main>
+
+  <nav class="bar">
+    <button id="btnNew" type="button" title="Nytt spel"><span class="ic">✚</span><span class="lbl">Nytt</span></button>
+    <button id="btnUndo" type="button" title="Ångra (Ctrl+Z)"><span class="ic">↶</span><span class="lbl">Ångra</span></button>
+    <button id="btnAuto" type="button" class="accent" hidden title="Lägg upp alla kort"><span class="ic">✓</span><span class="lbl">Lägg upp</span></button>
+    <div class="hud"><span id="hudTime">0:00</span><span class="dot">·</span><span id="hudMoves">0 drag</span></div>
+    <button id="btnMenu" type="button" title="Meny"><span class="ic">☰</span><span class="lbl">Meny</span></button>
+  </nav>
+
+  <!-- Lagringsnotis: visas bara om man inte redan godkänt -->
+  <div id="consent" class="consent" hidden role="dialog" aria-live="polite">
+    <p><strong>Inga cookies här.</strong> Vill du att inställningar, statistik och pågående spel sparas på den här enheten? Inget skickas någonstans.</p>
+    <div class="consent-btns">
+      <button id="consentYes" type="button" class="primary">Godkänn</button>
+      <button id="consentNo" type="button" class="link">Inte nu</button>
+    </div>
+  </div>
+
+  <!-- Meny -->
+  <div id="menu" class="overlay" hidden>
+    <div class="dialog" role="dialog" aria-labelledby="menuTitle">
+      <h2 id="menuTitle">Meny</h2>
+
+      <h3>Dra kort från högen</h3>
+      <div class="seg">
+        <label><input type="radio" name="draw" value="1"> Dra 1</label>
+        <label><input type="radio" name="draw" value="3"> Dra 3</label>
+      </div>
+      <p id="drawNote" class="note" hidden>Gäller från nästa nya spel.</p>
+
+      <h3>Statistik</h3>
+      <table class="stats">
+        <tr><td>Spelade</td><td id="stPlayed">0</td></tr>
+        <tr><td>Vunna</td><td id="stWon">0</td></tr>
+        <tr><td>Vinstprocent</td><td id="stPct">–</td></tr>
+        <tr><td>Bästa tid</td><td id="stTime">–</td></tr>
+        <tr><td>Minst antal drag</td><td id="stMoves">–</td></tr>
+      </table>
+      <button id="btnResetStats" type="button" class="link">Nollställ statistik</button>
+
+      <h3>Lagring</h3>
+      <p id="storeStatus" class="note"></p>
+      <button id="btnStore" type="button" class="secondary"></button>
+
+      <h3>Så spelar du</h3>
+      <p class="note">Bygg upp varje färg från ess till kung uppe till höger. I spelplanen lägger du kort i fallande ordning med omväxlande röd och svart färg. Bara kungar får läggas på tomma platser. Dra korten, eller tryck/klicka på ett kort så flyttas det automatiskt till bästa platsen.</p>
+
+      <div class="dialog-btns"><button id="menuClose" type="button" class="primary">Stäng</button></div>
+    </div>
+  </div>
+
+  <!-- Bekräfta nytt spel -->
+  <div id="confirm" class="overlay" hidden>
+    <div class="dialog small" role="dialog">
+      <h2>Nytt spel?</h2>
+      <p>Det pågående spelet räknas som förlorat.</p>
+      <div class="dialog-btns">
+        <button id="confirmNo" type="button" class="secondary">Avbryt</button>
+        <button id="confirmYes" type="button" class="primary">Nytt spel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vinst -->
+  <div id="win" class="overlay" hidden>
+    <div class="dialog small" role="dialog">
+      <h2>🎉 Du vann!</h2>
+      <p id="winText"></p>
+      <div class="dialog-btns"><button id="winNew" type="button" class="primary">Nytt spel</button></div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
